@@ -49,17 +49,32 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
     // Get viewport-relative position
     const rect = (event.target as HTMLElement).getBoundingClientRect();
     
-    // Calculate position for the tooltip
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    
+    // Calculate position for the tooltip
     const spaceBelow = viewportHeight - rect.bottom;
     const tooltipHeight = 300; // Approximate max height
+    const tooltipWidth = Math.min(viewportWidth - 32, 400); // Responsive width with 16px padding on each side
     
     // Position above or below based on available space
     const positionAbove = spaceBelow < tooltipHeight && rect.top > tooltipHeight;
     
+    // Calculate horizontal position, ensuring it stays within screen bounds
+    let leftPosition = rect.left + (rect.width / 2);
+    
+    // Adjust if too close to screen edge
+    const minMargin = 16; // Minimum margin from screen edge
+    if (leftPosition - (tooltipWidth / 2) < minMargin) {
+      leftPosition = tooltipWidth / 2 + minMargin;
+    } else if (leftPosition + (tooltipWidth / 2) > viewportWidth - minMargin) {
+      leftPosition = viewportWidth - (tooltipWidth / 2) - minMargin;
+    }
+    
     setTooltipStyle({
       position: 'fixed',
-      left: `${rect.left + rect.width / 2}px`,
+      left: `${leftPosition}px`,
       top: positionAbove 
         ? `${rect.top - 10}px` 
         : `${rect.bottom + 10}px`,
@@ -67,6 +82,8 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
         ? 'translate(-50%, -100%)' 
         : 'translateX(-50%)',
       maxHeight: '300px',
+      width: `${tooltipWidth}px`,
+      maxWidth: '100%',
       overflowY: 'auto',
       zIndex: 50
     });
@@ -118,12 +135,8 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
       
       {showTooltip && selectedWord && (
         <div 
-          className="word-tooltip fixed bg-card-bg text-text-primary shadow-lg rounded-lg p-4 max-w-md custom-scrollbar"
-          style={{
-            ...tooltipStyle,
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
-          }}
+          className="word-tooltip fixed bg-card-bg text-text-primary shadow-lg rounded-lg p-4 custom-scrollbar"
+          style={tooltipStyle}
         >
           <div className="word-definition">
             <div className="flex justify-between items-center mb-2">
