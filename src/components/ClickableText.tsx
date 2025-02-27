@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { getWordDefinition, processWiktionaryData, getWordPronunciation } from '@/services/dictionaryService';
+import { usePostHog } from 'posthog-js/react';
 
 interface ClickableTextProps {
   text: string;
@@ -16,6 +17,7 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [tooltipStyle, setTooltipStyle] = useState({});
   const [showTooltip, setShowTooltip] = useState(false);
+  const posthog = usePostHog();
   
   // Split text into words while preserving punctuation and spaces
   const words = text.split(/(\s+|[.,!?;:])/g).filter(word => word !== '');
@@ -45,6 +47,12 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
   const handleWordClick = (word: string, event: React.MouseEvent) => {
     // Ignore punctuation and spaces
     if (/^\s+$|^[.,!?;:]$/.test(word)) return;
+    
+    // Track word click event in PostHog
+    posthog?.capture('word_clicked', { 
+      word: word,
+      language: 'German'
+    });
     
     // Get viewport-relative position
     const rect = (event.target as HTMLElement).getBoundingClientRect();

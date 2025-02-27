@@ -4,23 +4,29 @@ import { dummyStories } from "@/data/dummyStories";
 import { useState, use } from "react";
 import Link from "next/link";
 import ClickableText from "@/components/ClickableText";
-import { Metadata } from "next";
-
-// This function needs to be in a separate server component file
-// We'll create a separate generateMetadata function in a layout.tsx file
-// For now, we'll focus on the client component
+import { usePostHog } from 'posthog-js/react';
 
 export default function StoryPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const story = dummyStories.find(s => s.id === parseInt(resolvedParams.id));
   const [visibleTranslations, setVisibleTranslations] = useState<number[]>([]);
+  const posthog = usePostHog();
 
   if (!story) {
     return <div>Story not found</div>;
   }
 
-  // Rest of the component remains the same
   const toggleTranslation = (index: number) => {
+    const isShowing = !visibleTranslations.includes(index);
+    
+    // Track translation toggle event
+    posthog?.capture('translation_toggled', {
+      story_id: story.id,
+      story_title: story.title,
+      paragraph_index: index,
+      action: isShowing ? 'show' : 'hide'
+    });
+    
     setVisibleTranslations(prev => 
       prev.includes(index) 
         ? prev.filter(i => i !== index)
