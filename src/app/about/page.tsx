@@ -1,4 +1,30 @@
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://talesofdeutsch.vercel.app"),
+  title: "About | Tales of Deutsch",
+  description: "Learn about Tales of Deutsch, a platform designed to help you learn German through immersive storytelling.",
+  openGraph: {
+    title: "About | Tales of Deutsch",
+    description: "Learn about Tales of Deutsch, a platform designed to help you learn German through immersive storytelling.",
+    type: "website",
+    images: [
+      {
+        url: "/images/tales-of-deutsch.png",
+        width: 1200,
+        height: 630,
+        alt: "Tales of Deutsch",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About | Tales of Deutsch",
+    description: "Learn about Tales of Deutsch, a platform designed to help you learn German through immersive storytelling.",
+    images: ["/images/tales-of-deutsch.png"],
+  },
+};
 
 export default function About() {
   return (

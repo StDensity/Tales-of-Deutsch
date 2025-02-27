@@ -11,7 +11,6 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   // Ensure params.id is properly handled as a string and awaited
-
   const {id} = await Promise.resolve(params);
   
   // Find the story by ID
@@ -31,15 +30,30 @@ export async function generateMetadata(
     ? `${description.substring(0, 157)}...` 
     : description;
 
-  // Rest of the function remains the same
   return {
     title: `${story.title} | Tales of Deutsch`,
     description: truncatedDescription,
     openGraph: {
-      // Content remains the same
+      title: `${story.title} | Tales of Deutsch`,
+      description: truncatedDescription,
+      url: `/story/${id}`,
+      siteName: "Tales of Deutsch",
+      locale: "en_US",
+      type: "article",
+      images: [
+        {
+          url: "/images/tales-of-deutsch.png",
+          width: 1200,
+          height: 630,
+          alt: story.title,
+        },
+      ],
     },
     twitter: {
-      // Content remains the same
+      card: "summary_large_image",
+      title: `${story.title} | Tales of Deutsch`,
+      description: truncatedDescription,
+      images: ["/images/tales-of-deutsch.png"],
     },
   };
 }

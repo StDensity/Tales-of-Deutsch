@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tales-of-deutsch.vercel.app"),
+  metadataBase: new URL("https://talesofdeutsch.vercel.app"),
   title: {
     default: "Tales of Deutsch | Learn German Through Stories",
     template: "%s | Tales of Deutsch",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://tales-of-deutsch.vercel.app/",
+    url: "https://talesofdeutsch.vercel.app/",
     title: "Tales of Deutsch | Learn German Through Stories",
     description: "Learn German through interactive stories with translations and word definitions.",
     siteName: "Tales of Deutsch",
