@@ -3,6 +3,7 @@
 import { dummyStories } from "@/data/dummyStories";
 import { useState, use } from "react";
 import Link from "next/link";
+import ClickableText from "@/components/ClickableText";
 
 export default function StoryPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -24,7 +25,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
   return (
     <main className="min-h-screen p-8">
       <Link 
-        href="/" 
+        href="/stories" 
         className="inline-block mb-8 text-accent hover:underline"
       >
         ← Back to Stories
@@ -39,7 +40,10 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
               key={index} 
               className="bg-card-bg rounded-lg p-6"
             >
-              <p className="text-lg mb-4">{paragraph.german}</p>
+              <ClickableText 
+                text={paragraph.german} 
+                className="text-lg mb-4"
+              />
               
               <button
                 onClick={() => toggleTranslation(index)}
