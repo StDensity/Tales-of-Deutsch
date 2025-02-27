@@ -1,6 +1,9 @@
 // Cache for storing previously looked up words
 const cache: Record<string, any> = {};
 
+// Get API URL from environment variables or use default
+const WIKTIONARY_API_URL = process.env.NEXT_PUBLIC_WIKTIONARY_API_URL || 'https://en.wiktionary.org/api/rest_v1/page';
+
 export async function getWordDefinition(word: string): Promise<any> {
   // Remove any punctuation and convert to lowercase
   const cleanWord = word.toLowerCase().replace(/[.,!?;:]/g, '');
@@ -13,7 +16,7 @@ export async function getWordDefinition(word: string): Promise<any> {
   try {
     // Use Wiktionary API which has better German support
     const response = await fetch(
-      `https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(cleanWord)}`
+      `${WIKTIONARY_API_URL}/definition/${encodeURIComponent(cleanWord)}`
     );
     
     if (!response.ok) {
@@ -36,7 +39,7 @@ export async function getWordDefinition(word: string): Promise<any> {
 export async function getWordPronunciation(word: string): Promise<string | null> {
   try {
     const response = await fetch(
-      `https://en.wiktionary.org/api/rest_v1/page/media/${encodeURIComponent(word)}`
+      `${WIKTIONARY_API_URL}/media/${encodeURIComponent(word)}`
     );
     
     if (!response.ok) {
