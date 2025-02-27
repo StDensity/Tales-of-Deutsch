@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import { PostHogProvider } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://tales-of-deutsch.vercel.app"),
   title: {
     default: "Tales of Deutsch | Learn German Through Stories",
     template: "%s | Tales of Deutsch",
@@ -51,7 +53,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -62,8 +63,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <PostHogProvider>
         <Header />
-        {children}
+          {children}
+        </PostHogProvider>
       </body>
     </html>
   );
