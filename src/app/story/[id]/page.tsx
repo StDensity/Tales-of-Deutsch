@@ -4,6 +4,11 @@ import { dummyStories } from "@/data/dummyStories";
 import { useState, use } from "react";
 import Link from "next/link";
 import ClickableText from "@/components/ClickableText";
+import { Metadata } from "next";
+
+// This function needs to be in a separate server component file
+// We'll create a separate generateMetadata function in a layout.tsx file
+// For now, we'll focus on the client component
 
 export default function StoryPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -14,6 +19,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
     return <div>Story not found</div>;
   }
 
+  // Rest of the component remains the same
   const toggleTranslation = (index: number) => {
     setVisibleTranslations(prev => 
       prev.includes(index) 
@@ -24,6 +30,7 @@ export default function StoryPage({ params }: { params: Promise<{ id: string }> 
 
   return (
     <main className="min-h-screen p-8">
+      {/* Component content remains the same */}
       <Link 
         href="/stories" 
         className="inline-block mb-8 text-accent hover:underline"

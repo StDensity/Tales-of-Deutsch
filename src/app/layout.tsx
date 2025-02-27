@@ -14,9 +14,43 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tales of Deutsch - Learn German Through Stories",
-  description: "Improve your German language skills through engaging stories with interactive translations",
+  title: {
+    default: "Tales of Deutsch | Learn German Through Stories",
+    template: "%s | Tales of Deutsch",
+  },
+  description: "Learn German through interactive stories with translations and word definitions.",
+  keywords: ["German", "language learning", "stories", "translations", "interactive learning"],
+  authors: [{ name: "Tales of Deutsch Team" }],
+  creator: "Tales of Deutsch",
+  publisher: "Tales of Deutsch",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://tales-of-deutsch.vercel.app/",
+    title: "Tales of Deutsch | Learn German Through Stories",
+    description: "Learn German through interactive stories with translations and word definitions.",
+    siteName: "Tales of Deutsch",
+    images: [
+      {
+        url: "/images/tales-of-deutsch.png",
+        width: 1200,
+        height: 630,
+        alt: "Tales of Deutsch",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tales of Deutsch | Learn German Through Stories",
+    description: "Learn German through interactive stories with translations and word definitions.",
+    images: ["/images/tales-of-deutsch.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
+
 
 export default function RootLayout({
   children,
