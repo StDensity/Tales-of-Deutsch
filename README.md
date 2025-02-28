@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tales of Deutsch
+
+![Tales of Deutsch](/public/images/tales-of-deutsch.png)
+
+Tales of Deutsch is an interactive platform designed to help you learn German through engaging stories. Our approach combines storytelling with interactive features to make language learning more natural and enjoyable.
+
+## Features
+
+- **Interactive Stories**: Read German stories with paragraph-by-paragraph translations
+- **Word Definitions**: Click on any word to see its definition and hear its pronunciation
+- **Progressive Learning**: Stories of varying difficulty levels to match your progress
+- **Instant Translations**: Toggle between German and English text as needed
 
 ## Getting Started
 
-First, run the development server:
+Visit [Tales of Deutsch](https://talesofdeutsch.vercel.app) to start your German learning journey.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Browse our collection of stories
+2. Click on any story to start reading
+3. Click on words to see their definitions
+4. Use the translation toggle to check your understanding
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How It Works
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Word Lookup**: Click any word in the stories to see its definition and hear its pronunciation
+- **Paragraph Translations**: Show/hide English translations for each paragraph
+- **Progress at Your Pace**: Choose stories that match your comfort level
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## About the Content
 
-## Learn More
+Our stories and translations are generated using Language Learning Models (LLMs) to provide a wide range of learning materials. The interactive features are designed to help you understand context and build vocabulary naturally.
 
-To learn more about Next.js, take a look at the following resources:
+## Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+We're always looking to improve Tales of Deutsch. If you have suggestions or find any issues, please feel free to:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Open an issue
+2. Submit a pull request
+3. Share your feedback
 
-## Deploy on Vercel
+## Contact
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For any questions or feedback, please reach out through:
+- GitHub Issues
+- [Our Website](https://talesofdeutsch.vercel.app)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+Built with ❤️ for German language learners
