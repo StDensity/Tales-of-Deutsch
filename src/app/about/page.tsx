@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function About() {
   return (
-    <main className="min-h-screen p-8">
+    <main className="min-h-screen p-8 pb-16">
       <Link 
         href="/" 
         className="inline-block mb-8 text-accent hover:underline"
