@@ -44,6 +44,11 @@ For any questions or feedback, please reach out through:
 - GitHub Issues
 - [Our Website](https://talesofdeutsch.vercel.app)
 
+## Attributions
+
+### Dictionary Services
+- **Wiktionary**: This project uses content from [Wiktionary](https://www.wiktionary.org/), which is available under the [Creative Commons Attribution-ShareAlike License](https://creativecommons.org/licenses/by-sa/3.0/).
+- **dict.cc**: Word translations and pronunciations are provided by [dict.cc](https://www.dict.cc/). dict.cc is a free dictionary service created by Paul Hemetsberger.
 ---
 
 Built with ❤️ for German language learners
