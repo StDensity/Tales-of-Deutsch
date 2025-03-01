@@ -13,10 +13,9 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [definition, setDefinition] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [tooltipStyle, setTooltipStyle] = useState({});
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showDictCcPronunciation, setShowDictCcPronunciation] = useState(false);
   const posthog = usePostHog();
   
   // Split text into words while preserving punctuation and spaces
@@ -99,7 +98,6 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
   };
   
   // Removed playPronunciation function
-  
   // Close tooltip when clicking outside
   useEffect(() => {
     if (!showTooltip) return;
@@ -107,6 +105,7 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
     const handleClickOutside = (e: MouseEvent) => {
       if (!(e.target as Element).closest('.word-tooltip')) {
         setShowTooltip(false);
+        setShowDictCcPronunciation(false);
       }
     };
     
@@ -143,14 +142,12 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
           <div className="word-definition">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg font-medium">{selectedWord}</h3>
-              <a 
-                href={`https://www.dict.cc/?s=${selectedWord}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button 
+                onClick={() => setShowDictCcPronunciation(true)}
                 className="text-accent hover:text-accent/80 text-sm"
               >
-                🔊 Hear on dict.cc
-              </a>
+                🔊 Hear pronunciation
+              </button>
             </div>
             
             {loading ? (
@@ -210,12 +207,32 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
               </div>
             )}
             
-            <button 
-              className="text-sm text-accent mt-2"
-              onClick={() => setShowTooltip(false)}
-            >
-              Close
-            </button>
+            {showDictCcPronunciation && (
+              <div className="mt-3 border-t pt-3 border-accent/20">
+                <p className="text-sm font-medium mb-2">Pronunciation from dict.cc:</p>
+                <iframe
+                  src={`https://www.dict.cc/?s=${selectedWord}`}
+                  className="w-full h-[300px] bg-background rounded border border-accent/20"
+                ></iframe>
+              </div>
+            )}
+            
+            <div className="flex justify-between mt-3">
+              <button 
+                className="text-sm text-accent"
+                onClick={() => setShowTooltip(false)}
+              >
+                Close
+              </button>
+              {showDictCcPronunciation && (
+                <button 
+                  className="text-sm text-accent"
+                  onClick={() => setShowDictCcPronunciation(false)}
+                >
+                  Hide pronunciation
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
