@@ -1,89 +1,93 @@
-'use client';
+"use client";
 
 import { dummyStories } from "@/data/dummyStories";
 import { useState, use } from "react";
 import Link from "next/link";
 import ClickableText from "@/components/ClickableText";
-import { usePostHog } from 'posthog-js/react';
+import { usePostHog } from "posthog-js/react";
 
-export default function StoryPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  const story = dummyStories.find(s => s.id === parseInt(resolvedParams.id));
-  const [visibleTranslations, setVisibleTranslations] = useState<number[]>([]);
-  const posthog = usePostHog();
+export default function StoryPage({
+   params,
+}: {
+   params: Promise<{ id: string }>;
+}) {
+   const resolvedParams = use(params);
+   const story = dummyStories.find((s) => s.id === parseInt(resolvedParams.id));
+   const [visibleTranslations, setVisibleTranslations] = useState<number[]>([]);
+   const posthog = usePostHog();
 
-  if (!story) {
-    return <div>Story not found</div>;
-  }
+   if (!story) {
+      return <div>Story not found</div>;
+   }
 
-  const toggleTranslation = (index: number) => {
-    const isShowing = !visibleTranslations.includes(index);
-    
-    // Track translation toggle event
-    posthog?.capture('translation_toggled', {
-      story_id: story.id,
-      story_title: story.title,
-      paragraph_index: index,
-      action: isShowing ? 'show' : 'hide'
-    });
-    
-    setVisibleTranslations(prev => 
-      prev.includes(index) 
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
-  };
+   const toggleTranslation = (index: number) => {
+      const isShowing = !visibleTranslations.includes(index);
 
-  return (
-    <main className="min-h-screen p-8 pb-16">
-      <Link 
-        href="/stories" 
-        className="inline-block mb-8 text-accent hover:underline"
-      >
-        ← Back to Stories
-      </Link>
-      
-      <article className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-semibold mb-8">{story.title}</h1>
-        
-        <div className="space-y-8">
-          {story.content.map((paragraph, index) => (
-            <div 
-              key={index} 
-              className="bg-card-bg rounded-lg p-6"
-            >
-              <ClickableText 
-                text={paragraph.german} 
-                className="text-lg mb-4"
-              />
-              
-              <button
-                onClick={() => toggleTranslation(index)}
-                className="text-accent hover:text-accent/80 transition-colors"
-              >
-                {visibleTranslations.includes(index) ? 'Hide' : 'Show'} Translation
-              </button>
-              
-              <div 
-                className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                  visibleTranslations.includes(index) ? 'max-h-[500px] opacity-100 mt-4' : 'max-h-0 opacity-0'
-                }`}
-              >
-                <p className="text-text-secondary italic">
-                  {paragraph.english}
-                </p>
-              </div>
+      // Track translation toggle event
+      posthog?.capture("translation_toggled", {
+         story_id: story.id,
+         story_title: story.title,
+         paragraph_index: index,
+         action: isShowing ? "show" : "hide",
+      });
+
+      setVisibleTranslations((prev) =>
+         prev.includes(index)
+            ? prev.filter((i) => i !== index)
+            : [...prev, index]
+      );
+   };
+
+   return (
+      <main className="min-h-screen p-8 pb-16">
+         <Link
+            href="/stories"
+            className="inline-block mb-8 text-accent hover:underline"
+         >
+            ← Back to Stories
+         </Link>
+
+         <article className="max-w-3xl mx-auto">
+            <h1 className="text-4xl font-semibold mb-8">{story.title}</h1>
+
+            <div className="space-y-8">
+               {story.content.map((paragraph, index) => (
+                  <div key={index} className="bg-card-bg rounded-lg p-6">
+                     <ClickableText
+                        text={paragraph.german}
+                        className="text-lg mb-4"
+                     />
+
+                     <button
+                        onClick={() => toggleTranslation(index)}
+                        className="text-accent hover:text-accent/80 transition-colors"
+                     >
+                        {visibleTranslations.includes(index) ? "Hide" : "Show"}{" "}
+                        Translation
+                     </button>
+
+                     <div
+                        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                           visibleTranslations.includes(index)
+                              ? "max-h-[500px] opacity-100 mt-4"
+                              : "max-h-0 opacity-0"
+                        }`}
+                     >
+                        <p className="text-text-secondary italic">
+                           {paragraph.english}
+                        </p>
+                     </div>
+                  </div>
+               ))}
             </div>
-          ))}
-        </div>
-        
-        {/* Updated AI-generated content notification */}
-        <div className="mt-12 mb-4 text-center">
-          <p className="text-xs text-text-secondary italic">
-            Stories and translations are generated by LLMs
-          </p>
-        </div>
-      </article>
-    </main>
-  );
+
+            {/* Updated AI-generated content notification */}
+            <div className="mt-12 mb-4 text-center">
+               <p className="text-xs text-text-secondary italic">
+                  Stories and translations are generated by LLMs
+               </p>
+            </div>
+         </article>
+      </main>
+   );
 }

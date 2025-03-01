@@ -84,24 +84,24 @@ export function processWiktionaryData(data: any): any {
     };
   }
   
-  // Fall back to English if no German definitions
-  const englishDefs = data.en;
-  if (englishDefs && englishDefs.length > 0) {
-    return {
-      language: 'English',
-      definitions: englishDefs.map((def: any) => ({
-        partOfSpeech: def.partOfSpeech,
-        meanings: def.definitions.map((meaning: any) => ({
-          definition: stripHtml(meaning.definition),
-          examples: meaning.examples ? meaning.examples.map(stripHtml) : [],
-          translations: meaning.parsedExamples ? meaning.parsedExamples.map((ex: any) => ({
-            example: stripHtml(ex.example),
-            translation: stripHtml(ex.translation)
-          })) : []
-        }))
-      }))
-    };
-  }
+  // // Fall back to English if no German definitions
+  // const englishDefs = data.en;
+  // if (englishDefs && englishDefs.length > 0) {
+  //   return {
+  //     language: 'English',
+  //     definitions: englishDefs.map((def: any) => ({
+  //       partOfSpeech: def.partOfSpeech,
+  //       meanings: def.definitions.map((meaning: any) => ({
+  //         definition: stripHtml(meaning.definition),
+  //         examples: meaning.examples ? meaning.examples.map(stripHtml) : [],
+  //         translations: meaning.parsedExamples ? meaning.parsedExamples.map((ex: any) => ({
+  //           example: stripHtml(ex.example),
+  //           translation: stripHtml(ex.translation)
+  //         })) : []
+  //       }))
+  //     }))
+  //   };
+  // }
   
   return null;
 }
