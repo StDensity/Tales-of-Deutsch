@@ -207,7 +207,15 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
                 ))}
               </div>
             ) : (
-              <p>No definition found for "{selectedWord}".</p>
+              <div>
+    <p className="text-sm text-text-secondary mb-2">
+      No direct definition found. Try dict.cc:
+    </p>
+    <iframe
+      src={`https://syn.dict.cc/dcc-gadget.php?s=${selectedWord}`}
+      className="w-full h-[75px] bg-background  px-1.5 rounded"
+    ></iframe>
+  </div>
             )}
             
             <button 
