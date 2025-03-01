@@ -205,17 +205,18 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
                     ))}
                   </div>
                 ))}
+                <p className="text-xs text-text-secondary mt-2 italic">Powered by Wiktionary</p>
               </div>
             ) : (
               <div>
-    <p className="text-sm text-text-secondary mb-2">
-      No direct definition found. Try dict.cc:
-    </p>
-    <iframe
-      src={`https://syn.dict.cc/dcc-gadget.php?s=${selectedWord}`}
-      className="w-full h-[75px] bg-background  px-1.5 rounded"
-    ></iframe>
-  </div>
+                <p className="text-sm text-text-secondary mb-2">
+                  Couldn't find any definition from Wiktionary. Trying dict.cc:
+                </p>
+                <iframe
+                  src={`https://syn.dict.cc/dcc-gadget.php?s=${selectedWord}`}
+                  className="w-full h-[75px] bg-background px-1.5 rounded"
+                ></iframe>
+              </div>
             )}
             
             <button 
