@@ -31,9 +31,7 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
       try {
         const rawData = await getWordDefinition(selectedWord);
         setDefinition(processWiktionaryData(rawData));
-        
-        const audio = await getWordPronunciation(selectedWord);
-        setAudioUrl(audio);
+        // Removed audio fetching
       } catch (error) {
         console.error('Error fetching word data:', error);
       } finally {
@@ -100,11 +98,7 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
     setShowTooltip(true);
   };
   
-  const playPronunciation = () => {
-    if (audioRef.current && audioUrl) {
-      audioRef.current.play();
-    }
-  };
+  // Removed playPronunciation function
   
   // Close tooltip when clicking outside
   useEffect(() => {
@@ -149,17 +143,14 @@ export default function ClickableText({ text, className = '' }: ClickableTextPro
           <div className="word-definition">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg font-medium">{selectedWord}</h3>
-              {audioUrl && (
-                <>
-                  <button 
-                    onClick={playPronunciation}
-                    className="text-accent hover:text-accent/80"
-                  >
-                    🔊 Play
-                  </button>
-                  <audio ref={audioRef} src={audioUrl} />
-                </>
-              )}
+              <a 
+                href={`https://www.dict.cc/?s=${selectedWord}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:text-accent/80 text-sm"
+              >
+                🔊 Hear on dict.cc
+              </a>
             </div>
             
             {loading ? (
