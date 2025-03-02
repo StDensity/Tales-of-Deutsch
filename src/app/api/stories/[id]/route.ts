@@ -3,19 +3,23 @@ import { getStoryById } from "@/services/storyService";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params:  Promise<{ id: string }> }
 ) {
+
   try {
-    const id = parseInt(params.id);
+    let {id} = await params;
+
+    const parsedId = parseInt(id);
     
-    if (isNaN(id)) {
+  
+    if (isNaN(parsedId)) {
       return NextResponse.json(
         { error: "Invalid story ID" },
         { status: 400 }
       );
     }
 
-    const story = await getStoryById(id);
+    const story = await getStoryById(parsedId);
     
     if (!story) {
       return NextResponse.json(
