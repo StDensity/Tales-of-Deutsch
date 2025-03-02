@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PostHogProvider } from "./providers";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -60,6 +61,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ClerkProvider >
     <html lang="en">
       <head>
         <meta name="google-site-verification" content="Ic7bfO2dT3gxxxRXOFEsrbaSkCSa0J3UETBjEZIk978" />
@@ -76,5 +78,6 @@ export default function RootLayout({
         </PostHogProvider>
       </body>
     </html>
+    </ClerkProvider>
   );
 }

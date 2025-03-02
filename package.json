@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.12.2",
+    "@neondatabase/serverless": "^0.10.4",
     "next": "15.2.0",
     "posthog-js": "^1.224.0",
     "react": "^19.0.0",

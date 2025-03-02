@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -42,6 +43,13 @@ export default function Header() {
             >
               All Stories
             </Link>
+            <SignedOut>
+              {/* <SignInButton /> */}
+              <SignUpButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </nav>
           
           {/* Mobile menu button */}
@@ -99,6 +107,15 @@ export default function Header() {
             >
               All Stories
             </Link>
+            <div className="px-3 py-2">
+              <SignedOut>
+                {/* <SignInButton /> */}
+                <SignUpButton />
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            </div>
           </div>
         )}
       </div>
