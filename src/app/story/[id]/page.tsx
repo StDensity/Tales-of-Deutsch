@@ -5,6 +5,7 @@ import { useState, use } from "react";
 import Link from "next/link";
 import ClickableText from "@/components/ClickableText";
 import { usePostHog } from "posthog-js/react";
+import { Story } from "@/types/story";
 
 export default function StoryPage({
    params,
@@ -49,6 +50,11 @@ export default function StoryPage({
 
          <article className="max-w-3xl mx-auto">
             <h1 className="text-4xl font-semibold mb-8">{story.title}</h1>
+            <div className="mb-6">
+               <span className="inline-block bg-accent/20 text-accent px-3 py-1 rounded-full text-sm">
+                  Level: {story.level}
+               </span>
+            </div>
 
             <div className="space-y-8">
                {story.content.map((paragraph, index) => (

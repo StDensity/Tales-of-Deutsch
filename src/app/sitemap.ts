@@ -1,7 +1,8 @@
 import { dummyStories } from "@/data/dummyStories";
+import { getAllStories } from "@/services/storyService";
 import { MetadataRoute } from "next";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://tales-of-deutsch.vercel.app";
   
   // Static routes
@@ -26,10 +27,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
   
-  // Dynamic story routes
-  const storyRoutes = dummyStories.map((story) => ({
+  // Dynamic story routes from database
+  const stories = await getAllStories();
+  const storyRoutes = stories.map((story) => ({
     url: `${baseUrl}/story/${story.id}`,
-    lastModified: new Date(),
+    // lastModified: new Date(story.updatedAt || story.createdAt),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));

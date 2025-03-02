@@ -1,5 +1,5 @@
 import StoryCard from "@/components/StoryCard";
-import { dummyStories } from "@/data/dummyStories";
+import { getAllStories } from "@/services/storyService";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -27,7 +27,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function StoriesPage() {
+export default async function StoriesPage() {
+  const stories = await getAllStories();
+  
   return (
     <main className="min-h-screen p-8 pb-16">
       <Link 
@@ -40,11 +42,17 @@ export default function StoriesPage() {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-semibold mb-8">German Stories</h1>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dummyStories.map(story => (
-            <StoryCard key={story.id} story={story} />
-          ))}
-        </div>
+        {stories.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {stories.map(story => (
+              <StoryCard key={story.id} story={story} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-lg text-text-secondary">No stories available yet. Check back soon!</p>
+          </div>
+        )}
         
         {/* Updated AI-generated content notification */}
         <div className="mt-12 mb-4 text-center">

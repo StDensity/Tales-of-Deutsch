@@ -1,10 +1,11 @@
 import StoryCard from "@/components/StoryCard";
-import { dummyStories } from "@/data/dummyStories";
+import { getAllStories } from "@/services/storyService";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
   // Get just the first 2 stories for the homepage
-  const featuredStories = dummyStories.slice(0, 2);
+  const allStories = await getAllStories();
+  const featuredStories = allStories.slice(0, 2);
   
   return (
     <div className="min-h-screen">
@@ -29,11 +30,17 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-semibold mb-8 text-center">Featured Stories</h2>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            {featuredStories.map((story) => (
-              <StoryCard key={story.id} story={story} />
-            ))}
-          </div>
+          {featuredStories.length > 0 ? (
+            <div className="grid md:grid-cols-2 gap-8">
+              {featuredStories.map((story) => (
+                <StoryCard key={story.id} story={story} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-lg text-text-secondary">No stories available yet. Check back soon!</p>
+            </div>
+          )}
           
           <div className="text-center mt-10">
             <Link 
