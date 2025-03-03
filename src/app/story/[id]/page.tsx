@@ -3,9 +3,11 @@
 import { useState, use } from "react";
 import Link from "next/link";
 import ClickableText from "@/components/ClickableText";
+import StoryMenu from "@/components/StoryMenu";
 import { usePostHog } from "posthog-js/react";
 import { Paragraph, Story } from "@/types/story";
 import { useQuery } from "@tanstack/react-query";
+import { useUser } from "@clerk/nextjs";
 
 // API fetch functions
 const fetchStory = async (id: string) => {
@@ -36,6 +38,21 @@ const fetchCategory = async (storyId: number) => {
     : "";
 };
 
+// Add function to check if user is the author
+const checkIsAuthor = async (storyId: number): Promise<boolean> => {
+  try {
+    const response = await fetch(`/api/stories/${storyId}/is-author`);
+    if (!response.ok) {
+      return false;
+    }
+    const data = await response.json();
+    return data.isAuthor;
+  } catch (error) {
+    console.error("Error checking if user is author:", error);
+    return false;
+  }
+};
+
 export default function StoryPage({
    params,
 }: {
@@ -44,6 +61,7 @@ export default function StoryPage({
    const {id} = use(params)
    const [visibleTranslations, setVisibleTranslations] = useState<number[]>([]);
    const posthog = usePostHog();
+   const { isSignedIn } = useUser();
 
    // Fetch story data with React Query
    const { data: story, isLoading: storyLoading, error: storyError } = useQuery({
@@ -63,6 +81,13 @@ export default function StoryPage({
      queryKey: ['category', story?.id],
      queryFn: () => fetchCategory(story?.id as number),
      enabled: !!story?.id, // Only run query if story id exists
+   });
+
+   // Add query to check if user is the author
+   const { data: isAuthor = false } = useQuery({
+     queryKey: ['isAuthor', story?.id],
+     queryFn: () => checkIsAuthor(story?.id as number),
+     enabled: !!story?.id && isSignedIn, // Only run if story exists and user is signed in
    });
 
    const toggleTranslation = (index: number) => {
@@ -132,7 +157,10 @@ export default function StoryPage({
          </Link>
 
          <article className="max-w-3xl mx-auto">
-            <h1 className="text-4xl font-semibold mb-4">{story.title}</h1>
+            <div className="flex justify-between items-start mb-4">
+               <h1 className="text-4xl font-semibold">{story.title}</h1>
+               <StoryMenu storyId={story.id} isAuthor={isAuthor} />
+            </div>
             
             {/* Story metadata section - improved styling */}
             <div className="flex flex-wrap items-center gap-4 mb-8 text-sm">
