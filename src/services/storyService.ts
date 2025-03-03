@@ -1,3 +1,5 @@
+// SERVER SIDE ONLY - Do not import in client components
+// This service should only be used in API routes or server components
 import { db } from "@/db";
 import { stories, paragraphs } from "@/db/schema";
 import { eq } from "drizzle-orm";
