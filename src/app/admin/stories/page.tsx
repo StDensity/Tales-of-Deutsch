@@ -3,23 +3,17 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import StoryFormManual from "@/components/StoryFormManual";
+import { ParagraphInput, Category } from "@/types/story";
 import { cefrLevelEnum } from "@/db/schema";
-
-interface ParagraphInput {
-  german: string;
-  english: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
 
 export default function AdminStoriesPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Form states
   const [title, setTitle] = useState("");
   const [level, setLevel] = useState<string>("A1");
   const [isCommunity, setIsCommunity] = useState(true);
@@ -30,7 +24,8 @@ export default function AdminStoriesPage() {
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
-
+  const cefrLevels = cefrLevelEnum.enumValues;
+  
   // Check if the current user is the admin
   useEffect(() => {
     if (isLoaded) {
@@ -46,11 +41,11 @@ export default function AdminStoriesPage() {
           setIsLoading(false);
         }
       };
-
+  
       checkAdmin();
     }
   }, [isLoaded, user]);
-
+  
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
@@ -64,36 +59,11 @@ export default function AdminStoriesPage() {
         console.error("Error fetching categories:", error);
       }
     };
-
-    if (isAdmin) {
-      fetchCategories();
-    }
-  }, [isAdmin]);
-
-  // Redirect non-admin users
-  useEffect(() => {
-    if (isLoaded && !isLoading && !isAdmin) {
-      router.push("/");
-    }
-  }, [isAdmin, isLoaded, isLoading, router]);
-
-  const handleParagraphChange = (index: number, field: keyof ParagraphInput, value: string) => {
-    const updatedParagraphs = [...paragraphs];
-    updatedParagraphs[index][field] = value;
-    setParagraphs(updatedParagraphs);
-  };
-
-  const addParagraph = () => {
-    setParagraphs([...paragraphs, { german: "", english: "" }]);
-  };
-
-  const removeParagraph = (index: number) => {
-    if (paragraphs.length > 1) {
-      const updatedParagraphs = paragraphs.filter((_, i) => i !== index);
-      setParagraphs(updatedParagraphs);
-    }
-  };
-
+  
+    fetchCategories();
+  }, []);
+  
+  // Handle category selection
   const handleCategoryChange = (categoryId: number) => {
     setSelectedCategories(prev => 
       prev.includes(categoryId)
@@ -101,12 +71,13 @@ export default function AdminStoriesPage() {
         : [...prev, categoryId]
     );
   };
-
+  
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage({ text: "", type: "" });
-
+  
     try {
       const response = await fetch("/api/admin/stories", {
         method: "POST",
@@ -124,9 +95,9 @@ export default function AdminStoriesPage() {
           })),
         }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         setMessage({ text: "Story added successfully!", type: "success" });
         // Reset form
@@ -145,21 +116,14 @@ export default function AdminStoriesPage() {
       setIsSubmitting(false);
     }
   };
-
-  if (isLoading) {
-    return <div className="min-h-screen p-8">Loading...</div>;
-  }
-
-  if (!isAdmin) {
-    return null; // Will redirect in useEffect
-  }
-  // Get the actual CEFR level values from the enum
-  const cefrLevels = cefrLevelEnum.enumValues;
-
+  
+  if (isLoading) return <div className="min-h-screen p-8">Loading...</div>;
+  if (!isAdmin) return null;
+  
   return (
     <main className="min-h-screen p-8 pb-16">
       <h1 className="text-3xl font-semibold mb-8">Admin: Add New Story</h1>
-
+  
       {message.text && (
         <div
           className={`p-4 mb-6 rounded-md ${
@@ -169,147 +133,34 @@ export default function AdminStoriesPage() {
           {message.text}
         </div>
       )}
-
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-card-bg p-6 rounded-lg shadow-md">
-        <div className="mb-6">
-          <label htmlFor="title" className="block mb-2 font-medium">
-            Story Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded-md bg-background"
+  
+      <div className="max-w-4xl mx-auto">
+        <form onSubmit={handleSubmit} className="bg-card-bg p-6 rounded-lg shadow-md">
+          <StoryFormManual
+            title={title}
+            setTitle={setTitle}
+            level={level}
+            setLevel={setLevel}
+            isCommunity={isCommunity}
+            setIsCommunity={setIsCommunity}
+            categories={categories}
+            selectedCategories={selectedCategories}
+            handleCategoryChange={handleCategoryChange}
+            paragraphs={paragraphs}
+            setParagraphs={setParagraphs}
           />
-        </div>
-
-        <div className="mb-6">
-          <label htmlFor="level" className="block mb-2 font-medium">
-            CEFR Level
-          </label>
-          <select
-            id="level"
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded-md bg-background"
-          >
-            {cefrLevels.map((levelOption) => (
-              <option key={levelOption} value={levelOption}>
-                {levelOption}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-2 font-medium">
-            Story Type
-          </label>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="isCommunity"
-              checked={isCommunity}
-              onChange={(e) => setIsCommunity(e.target.checked)}
-              className="mr-2 h-4 w-4"
-            />
-            <label htmlFor="isCommunity">
-              Community Story (visible to all users)
-            </label>
+  
+          <div className="mt-6">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-6 py-3 bg-accent text-white rounded-md hover:bg-accent/80 disabled:opacity-50"
+            >
+              {isSubmitting ? "Adding Story..." : "Add Story"}
+            </button>
           </div>
-        </div>
-
-        <div className="mb-6">
-          <label className="block mb-2 font-medium">
-            Categories
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            {categories.length > 0 ? (
-              categories.map((category) => (
-                <div key={category.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`category-${category.id}`}
-                    checked={selectedCategories.includes(category.id)}
-                    onChange={() => handleCategoryChange(category.id)}
-                    className="mr-2 h-4 w-4"
-                  />
-                  <label htmlFor={`category-${category.id}`}>{category.name}</label>
-                </div>
-              ))
-            ) : (
-              <p className="text-text-secondary">No categories available</p>
-            )}
-          </div>
-        </div>
-
-        <h2 className="text-xl font-medium mb-4">Paragraphs</h2>
-
-        {paragraphs.map((paragraph, index) => (
-          <div key={index} className="mb-8 p-4 border border-gray-200 rounded-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-medium">Paragraph {index + 1}</h3>
-              <button
-                type="button"
-                onClick={() => removeParagraph(index)}
-                disabled={paragraphs.length <= 1}
-                className="text-red-500 hover:text-red-700 disabled:opacity-50"
-              >
-                Remove
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor={`german-${index}`} className="block mb-2">
-                German Text
-              </label>
-              <textarea
-                id={`german-${index}`}
-                value={paragraph.german}
-                onChange={(e) => handleParagraphChange(index, "german", e.target.value)}
-                required
-                rows={4}
-                className="w-full p-2 border border-gray-300 rounded-md bg-background"
-              />
-            </div>
-
-            <div>
-              <label htmlFor={`english-${index}`} className="block mb-2">
-                English Translation
-              </label>
-              <textarea
-                id={`english-${index}`}
-                value={paragraph.english}
-                onChange={(e) => handleParagraphChange(index, "english", e.target.value)}
-                required
-                rows={4}
-                className="w-full p-2 border border-gray-300 rounded-md bg-background"
-              />
-            </div>
-          </div>
-        ))}
-
-        <button
-          type="button"
-          onClick={addParagraph}
-          className="mb-6 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-        >
-          Add Paragraph
-        </button>
-
-        <div className="mt-6">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-6 py-3 bg-accent text-white rounded-md hover:bg-accent/80 disabled:opacity-50"
-          >
-            {isSubmitting ? "Adding Story..." : "Add Story"}
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </main>
   );
 }

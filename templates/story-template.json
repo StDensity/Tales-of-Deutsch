@@ -1,0 +1,16 @@
+{
+  "title": "Your Story Title",
+  "level": "A1",
+  "isCommunity": true,
+  "categoryIds": [1],
+  "paragraphs": [
+    {
+      "german": "German text for paragraph 1",
+      "english": "English translation for paragraph 1"
+    },
+    {
+      "german": "German text for paragraph 2",
+      "english": "English translation for paragraph 2"
+    }
+  ]
+}

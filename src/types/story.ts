@@ -1,5 +1,5 @@
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
-import { stories, paragraphs } from "@/db/schema";
+import { stories, paragraphs, categories } from "@/db/schema";
 
 // Type for selecting a story (matches DB row)
 export type Story = InferSelectModel<typeof stories> & {
@@ -14,3 +14,13 @@ export type Paragraph = InferSelectModel<typeof paragraphs>;
 
 // Type for inserting a paragraph
 export type NewParagraph = InferInsertModel<typeof paragraphs>;
+
+// Type for paragraph input in forms
+export interface ParagraphInput {
+  german: string;
+  english: string;
+  paragraphOrder?: number;
+}
+
+// Type for category
+export type Category = InferSelectModel<typeof categories>;
