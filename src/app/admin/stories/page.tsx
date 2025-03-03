@@ -10,6 +10,11 @@ interface ParagraphInput {
   english: string;
 }
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 export default function AdminStoriesPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
@@ -17,6 +22,9 @@ export default function AdminStoriesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [level, setLevel] = useState<string>("A1");
+  const [isCommunity, setIsCommunity] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [paragraphs, setParagraphs] = useState<ParagraphInput[]>([
     { german: "", english: "" },
   ]);
@@ -43,6 +51,25 @@ export default function AdminStoriesPage() {
     }
   }, [isLoaded, user]);
 
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/categories");
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    if (isAdmin) {
+      fetchCategories();
+    }
+  }, [isAdmin]);
+
   // Redirect non-admin users
   useEffect(() => {
     if (isLoaded && !isLoading && !isAdmin) {
@@ -67,6 +94,14 @@ export default function AdminStoriesPage() {
     }
   };
 
+  const handleCategoryChange = (categoryId: number) => {
+    setSelectedCategories(prev => 
+      prev.includes(categoryId)
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -81,6 +116,8 @@ export default function AdminStoriesPage() {
         body: JSON.stringify({
           title,
           level,
+          isCommunity,
+          categoryIds: selectedCategories,
           paragraphs: paragraphs.map((p, index) => ({
             ...p,
             paragraphOrder: index,
@@ -95,6 +132,8 @@ export default function AdminStoriesPage() {
         // Reset form
         setTitle("");
         setLevel("A1");
+        setIsCommunity(true);
+        setSelectedCategories([]);
         setParagraphs([{ german: "", english: "" }]);
       } else {
         setMessage({ text: data.error || "Failed to add story", type: "error" });
@@ -163,6 +202,48 @@ export default function AdminStoriesPage() {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="mb-6">
+          <label className="block mb-2 font-medium">
+            Story Type
+          </label>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="isCommunity"
+              checked={isCommunity}
+              onChange={(e) => setIsCommunity(e.target.checked)}
+              className="mr-2 h-4 w-4"
+            />
+            <label htmlFor="isCommunity">
+              Community Story (visible to all users)
+            </label>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <label className="block mb-2 font-medium">
+            Categories
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {categories.length > 0 ? (
+              categories.map((category) => (
+                <div key={category.id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`category-${category.id}`}
+                    checked={selectedCategories.includes(category.id)}
+                    onChange={() => handleCategoryChange(category.id)}
+                    className="mr-2 h-4 w-4"
+                  />
+                  <label htmlFor={`category-${category.id}`}>{category.name}</label>
+                </div>
+              ))
+            ) : (
+              <p className="text-text-secondary">No categories available</p>
+            )}
+          </div>
         </div>
 
         <h2 className="text-xl font-medium mb-4">Paragraphs</h2>

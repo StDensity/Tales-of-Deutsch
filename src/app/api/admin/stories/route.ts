@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
-import { stories, paragraphs } from "@/db/schema";
+import { stories, paragraphs, storyCategories } from "@/db/schema";
 import { NewStory, NewParagraph } from "@/types/story";
 import { db } from "@/db";
 
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { title, level, paragraphs: paragraphsData } = body;
+    const { title, level, isCommunity, categoryIds, paragraphs: paragraphsData } = body;
 
     // Validate input
     if (!title || !level || !paragraphsData || !Array.isArray(paragraphsData) || paragraphsData.length === 0) {
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       title,
       level,
       userId: user.id,
+      isCommunity: isCommunity !== undefined ? isCommunity : true,
     };
 
     const [insertedStory] = await db.insert(stories).values(newStory).returning();
@@ -51,6 +52,16 @@ export async function POST(request: NextRequest) {
     }));
 
     await db.insert(paragraphs).values(newParagraphs);
+
+    // Insert category associations if provided
+    if (categoryIds && Array.isArray(categoryIds) && categoryIds.length > 0) {
+      const storyCategoryValues = categoryIds.map(categoryId => ({
+        storyId: insertedStory.id,
+        categoryId
+      }));
+      
+      await db.insert(storyCategories).values(storyCategoryValues);
+    }
 
     return NextResponse.json({
       success: true,
