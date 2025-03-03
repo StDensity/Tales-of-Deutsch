@@ -1,35 +1,35 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import StoryCard from "@/components/StoryCard";
-import { getAllStories } from "@/services/storyService";
 import Link from "next/link";
-import { Metadata } from "next";
+import { Story } from "@/types/story";
 
-export const metadata: Metadata = {
-  title: "Stories | Tales of Deutsch",
-  description: "Explore German stories with interactive translations and word definitions to improve your language skills.",
-  openGraph: {
-    title: "Stories | Tales of Deutsch",
-    description: "Explore German stories with interactive translations and word definitions to improve your language skills.",
-    type: "website",
-    images: [
-      {
-        url: "/images/tales-of-deutsch.png",
-        width: 1200,
-        height: 630,
-        alt: "Tales of Deutsch Stories",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Stories | Tales of Deutsch",
-    description: "Explore German stories with interactive translations and word definitions to improve your language skills.",
-    images: ["/images/tales-of-deutsch.png"],
-  },
-};
+export default function StoriesPage() {
+  const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function StoriesPage() {
-  const stories = await getAllStories();
-  
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const response = await fetch('/api/stories');
+        if (!response.ok) {
+          throw new Error('Failed to fetch stories');
+        }
+        const data = await response.json();
+        setStories(data);
+      } catch (error) {
+        console.error('Error fetching stories:', error);
+        setError('Failed to load stories. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStories();
+  }, []);
+
   return (
     <main className="min-h-screen p-8 pb-16">
       <Link 
@@ -42,7 +42,15 @@ export default async function StoriesPage() {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-semibold mb-8">German Stories</h1>
         
-        {stories.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-text-secondary">Loading stories...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-lg text-red-500">{error}</p>
+          </div>
+        ) : stories.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stories.map(story => (
               <StoryCard key={story.id} story={story} />

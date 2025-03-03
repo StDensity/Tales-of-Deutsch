@@ -1,4 +1,3 @@
-import { dummyStories } from "@/data/dummyStories";
 import { getAllStories } from "@/services/storyService";
 import { MetadataRoute } from "next";
 
