@@ -2,7 +2,7 @@
 // This service should only be used in API routes or server components
 import { db } from "@/db";
 import { stories, paragraphs } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Story } from "@/types/story";
 
 export async function getAllStories(): Promise<Story[]> {
@@ -38,8 +38,10 @@ export async function getStoryById(id: number): Promise<Story | null> {
   try {
     // Fetch the story
     const story = await db.query.stories.findFirst({
-      where: eq(stories.id, id),
-    });
+      where: and(
+        eq(stories.id, id),
+        eq(stories.sentForDelete, false)
+    )})
 
     if (!story) {
       return null;
@@ -66,7 +68,10 @@ export async function getStoriesByCommunityStatus(includeCommunity: boolean): Pr
   try {
     // Fetch stories with the specified community status
     const filteredStories = await db.query.stories.findMany({
-      where: eq(stories.isCommunity, includeCommunity),
+      where: and(
+        eq(stories.isCommunity, includeCommunity),
+        eq(stories.sentForDelete, false) // Ensure only stories not marked for deletion are returned
+      ),
       with: {
         paragraphs: {
           orderBy: (paragraphs, { asc }) => [asc(paragraphs.paragraphOrder)],
@@ -74,6 +79,7 @@ export async function getStoriesByCommunityStatus(includeCommunity: boolean): Pr
       },
       orderBy: (stories, { desc }) => [desc(stories.createdAt)],
     });
+    
 
     // Format the response
     const formattedStories = filteredStories.map(story => ({
