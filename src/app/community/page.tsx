@@ -51,9 +51,9 @@ export default function CommunityStoriesPage() {
         </div>
         
         {/* Disclaimer Banner */}
-        <div className="bg-amber-50 border border-amber-200 p-4 rounded-md mb-8">
-          <h2 className="text-amber-800 font-medium text-lg mb-2">Community Content Disclaimer</h2>
-          <p className="text-amber-700">
+        <div className="bg-accent/10 border border-accent/20 p-4 rounded-md mb-8">
+          <h2 className="text-accent font-medium text-lg mb-2">Community Content Disclaimer</h2>
+          <p className="text-accent/80">
             Stories in this section are contributed by community members and are not developed or reviewed by Tales of Deutsch. 
             We are not responsible for the content, accuracy, or appropriateness of these stories. 
             Please report any inappropriate content.

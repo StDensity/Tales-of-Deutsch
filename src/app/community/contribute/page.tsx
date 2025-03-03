@@ -7,6 +7,7 @@ import Link from "next/link";
 import CommunityStoryContributionForm from "@/components/CommunityStoryContributionForm";
 import { ParagraphInput, Category } from "@/types/story";
 import { cefrLevelEnum } from "@/db/schema";
+import DevelopmentDisclaimer from "@/components/DevelopmentDisclaimer";
 
 // Import the template prompt
 const storyTemplate = {
@@ -145,10 +146,13 @@ export default function ContributeStoryPage() {
          >
             ← Back to Community Stories
          </Link>
-
+         
          <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-semibold mb-8">Contribute a Story</h1>
-
+            
+            {/* Development Disclaimer */}
+            <DevelopmentDisclaimer />
+            
             {/* Community contribution guidelines */}
             <div className="bg-card-bg border-2 border-accent/20 p-6 rounded-lg mb-8">
                <h2 className="text-accent font-semibold text-xl mb-4">

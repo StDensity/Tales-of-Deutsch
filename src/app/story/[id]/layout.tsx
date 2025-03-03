@@ -6,15 +6,33 @@ type Props = {
   children: React.ReactNode;
 };
 
+// Function to fetch story for metadata
+async function fetchStoryForMetadata(id: string) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/stories/${id}`, { 
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching story for metadata:", error);
+    return null;
+  }
+}
+
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   // Ensure params.id is properly handled as a string and awaited
-  const {id} = await Promise.resolve(params);
+  const { id } = await Promise.resolve(params);
   
-  // Find the story by ID
-  const story = dummyStories.find(s => s.id === parseInt(id));
+  // Fetch the story from the API
+  const story = await fetchStoryForMetadata(id);
   
   // If story not found, return default metadata
   if (!story) {
