@@ -1,13 +1,34 @@
 "use client"
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
+
+  // Check if the current user is an admin
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        const response = await fetch("/api/admin/check");
+        if (response.ok) {
+          const data = await response.json();
+          setIsAdmin(data.isAdmin);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminStatus();
+  }, []);
 
   const isActive = (path: string) => {
     return pathname === path;
@@ -43,6 +64,17 @@ export default function Header() {
             >
               All Stories
             </Link>
+            
+            {/* Admin link - only shown to admin users */}
+            {isAdmin && (
+              <Link 
+                href="/admin/stories" 
+                className={`transition-colors ${isActive('/admin/stories') ? 'text-accent font-medium' : 'text-text-primary hover:text-accent'}`}
+              >
+                Admin
+              </Link>
+            )}
+            
             <SignedOut>
               {/* <SignInButton /> */}
               <SignUpButton />
@@ -107,6 +139,22 @@ export default function Header() {
             >
               All Stories
             </Link>
+            
+            {/* Admin link in mobile menu - only shown to admin users */}
+            {isAdmin && (
+              <Link 
+                href="/admin/stories" 
+                className={`block px-3 py-2 rounded-md transition-colors ${
+                  isActive('/admin/stories') 
+                    ? 'text-accent font-medium' 
+                    : 'text-text-primary hover:text-accent hover:bg-background'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Admin
+              </Link>
+            )}
+            
             <div className="px-3 py-2">
               <SignedOut>
                 {/* <SignInButton /> */}
