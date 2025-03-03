@@ -1,67 +1,92 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import StoryFormManual from "@/components/StoryFormManual";
 import { ParagraphInput, Category } from "@/types/story";
 import { cefrLevelEnum } from "@/db/schema";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+// API fetch functions
+const checkAdminStatus = async () => {
+  const response = await fetch("/api/admin/check");
+  if (!response.ok) {
+    throw new Error("Failed to check admin status");
+  }
+  const data = await response.json();
+  return data.isAdmin;
+};
+
+const fetchCategories = async () => {
+  const response = await fetch("/api/categories");
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+  return response.json();
+};
+
+const createStory = async (storyData: any) => {
+  const response = await fetch("/api/admin/stories", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(storyData),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to add story");
+  }
+  return data;
+};
 
 export default function AdminStoriesPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const cefrLevels = cefrLevelEnum.enumValues;
   
   // Form states
   const [title, setTitle] = useState("");
   const [level, setLevel] = useState<string>("A1");
   const [isCommunity, setIsCommunity] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [paragraphs, setParagraphs] = useState<ParagraphInput[]>([
     { german: "", english: "" },
   ]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
-  const cefrLevels = cefrLevelEnum.enumValues;
-  
-  // Check if the current user is the admin
-  useEffect(() => {
-    if (isLoaded) {
-      const checkAdmin = async () => {
-        try {
-          const response = await fetch("/api/admin/check");
-          const data = await response.json();
-          setIsAdmin(data.isAdmin);
-        } catch (error) {
-          console.error("Error checking admin status:", error);
-          setIsAdmin(false);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-  
-      checkAdmin();
-    }
-  }, [isLoaded, user]);
-  
-  // Fetch categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("/api/categories");
-        if (response.ok) {
-          const data = await response.json();
-          setCategories(data);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-  
-    fetchCategories();
-  }, []);
+  // Query for admin status
+  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
+    queryKey: ['adminStatus', user?.id],
+    queryFn: checkAdminStatus,
+    enabled: isLoaded && !!user,
+  });
+  // Query for categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
+  // Mutation for creating a story
+  const { mutate, isPending: isSubmitting } = useMutation({
+    mutationFn: createStory,
+    onSuccess: () => {
+      // Reset form
+      setTitle("");
+      setLevel("A1");
+      setIsCommunity(true);
+      setSelectedCategories([]);
+      setParagraphs([{ german: "", english: "" }]);
+      setMessage({ text: "Story added successfully!", type: "success" });
+      
+      // Invalidate relevant queries
+      queryClient.invalidateQueries({ queryKey: ['stories'] });
+    },
+    onError: (error: Error) => {
+      setMessage({ text: error.message || "Failed to add story", type: "error" });
+    },
+  });
   
   // Handle category selection
   const handleCategoryChange = (categoryId: number) => {
@@ -73,51 +98,23 @@ export default function AdminStoriesPage() {
   };
   
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setMessage({ text: "", type: "" });
-  
-    try {
-      const response = await fetch("/api/admin/stories", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          level,
-          isCommunity,
-          categoryIds: selectedCategories,
-          paragraphs: paragraphs.map((p, index) => ({
-            ...p,
-            paragraphOrder: index,
-          })),
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        setMessage({ text: "Story added successfully!", type: "success" });
-        // Reset form
-        setTitle("");
-        setLevel("A1");
-        setIsCommunity(true);
-        setSelectedCategories([]);
-        setParagraphs([{ german: "", english: "" }]);
-      } else {
-        setMessage({ text: data.error || "Failed to add story", type: "error" });
-      }
-    } catch (error) {
-      console.error("Error adding story:", error);
-      setMessage({ text: "An error occurred while adding the story", type: "error" });
-    } finally {
-      setIsSubmitting(false);
-    }
+    
+    mutate({
+      title,
+      level,
+      isCommunity,
+      categoryIds: selectedCategories,
+      paragraphs: paragraphs.map((p, index) => ({
+        ...p,
+        paragraphOrder: index,
+      })),
+    });
   };
   
-  if (isLoading) return <div className="min-h-screen p-8">Loading...</div>;
+  if (isAdminLoading) return <div className="min-h-screen p-8">Loading...</div>;
   if (!isAdmin) return null;
   
   return (
