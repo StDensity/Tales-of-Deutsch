@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
    "/stories",
    "/story/(.*)",
    "/api/stories/(.*)",
+   "/api/stories",
    "/api/users/(.*)",
 ]);
 
