@@ -32,17 +32,27 @@ export default function FeaturedStories() {
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <p className="text-lg text-text-secondary">Loading stories...</p>
-      </div>
+      <section className="px-8 pb-16">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-semibold mb-8 text-center">Featured Stories</h2>
+          <div className="text-center py-8">
+            <p className="text-lg text-text-secondary">Loading stories...</p>
+          </div>
+        </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-8">
-        <p className="text-lg text-text-secondary">{error}</p>
-      </div>
+      <section className="px-8 pb-16">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-semibold mb-8 text-center">Featured Stories</h2>
+          <div className="text-center py-8">
+            <p className="text-lg text-text-secondary">{error}</p>
+          </div>
+        </div>
+      </section>
     );
   }
 
