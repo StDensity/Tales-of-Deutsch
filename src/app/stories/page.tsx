@@ -1,34 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import StoryCard from "@/components/StoryCard";
 import Link from "next/link";
 import { Story } from "@/types/story";
 
+// Function to fetch stories
+const fetchStories = async (): Promise<Story[]> => {
+  const response = await fetch('/api/stories');
+  if (!response.ok) {
+    throw new Error('Failed to fetch stories');
+  }
+  return response.json();
+};
+
 export default function StoriesPage() {
-  const [stories, setStories] = useState<Story[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchStories = async () => {
-      try {
-        const response = await fetch('/api/stories');
-        if (!response.ok) {
-          throw new Error('Failed to fetch stories');
-        }
-        const data = await response.json();
-        setStories(data);
-      } catch (error) {
-        console.error('Error fetching stories:', error);
-        setError('Failed to load stories. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStories();
-  }, []);
+  // Using React Query to fetch stories
+  const { data: stories, isLoading, error } = useQuery({
+    queryKey: ['stories'],
+    queryFn: fetchStories,
+  });
 
   return (
     <main className="min-h-screen p-8 pb-16">
@@ -42,15 +33,15 @@ export default function StoriesPage() {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-semibold mb-8">German Stories</h1>
         
-        {loading ? (
+        {isLoading ? (
           <div className="text-center py-12">
             <p className="text-lg text-text-secondary">Loading stories...</p>
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-lg text-red-500">{error}</p>
+            <p className="text-lg text-red-500">{error instanceof Error ? error.message : 'An error occurred'}</p>
           </div>
-        ) : stories.length > 0 ? (
+        ) : stories && stories.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stories.map(story => (
               <StoryCard key={story.id} story={story} />

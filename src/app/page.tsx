@@ -1,4 +1,3 @@
-import StoryCard from "@/components/StoryCard";
 import Link from "next/link";
 import FeaturedStories from "@/components/FeaturedStories";
 

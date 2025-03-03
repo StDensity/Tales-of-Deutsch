@@ -1,10 +1,40 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, use } from "react";
 import Link from "next/link";
 import ClickableText from "@/components/ClickableText";
 import { usePostHog } from "posthog-js/react";
-import { Story } from "@/types/story";
+import { Paragraph, Story } from "@/types/story";
+import { useQuery } from "@tanstack/react-query";
+
+// API fetch functions
+const fetchStory = async (id: string) => {
+  const response = await fetch(`/api/stories/${id}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch story");
+  }
+  return response.json();
+};
+
+const fetchAuthorName = async (userId: string) => {
+  const response = await fetch(`/api/users/${userId}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch author");
+  }
+  const data = await response.json();
+  return data.fullName || data.username || "Anonymous";
+};
+
+const fetchCategory = async (storyId: number) => {
+  const response = await fetch(`/api/stories/${storyId}/category`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch category");
+  }
+  const data = await response.json();
+  return data.categories && data.categories.length > 0 
+    ? data.categories[0].name 
+    : "";
+};
 
 export default function StoryPage({
    params,
@@ -12,71 +42,28 @@ export default function StoryPage({
    params: Promise<{ id: string }>;
 }) {
    const {id} = use(params)
-   const [story, setStory] = useState<Story | null>(null);
-   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState<string | null>(null);
-   const [authorName, setAuthorName] = useState<string>("");
-   const [category, setCategory] = useState<string>("");
    const [visibleTranslations, setVisibleTranslations] = useState<number[]>([]);
    const posthog = usePostHog();
 
-   // Fetch story from the database
-   useEffect(() => {
-      const fetchStory = async () => {
-         try {
-            const response = await fetch(`/api/stories/${id}`);
-            if (!response.ok) {
-               throw new Error("Failed to fetch story");
-            }
-            const data = await response.json();
-            setStory(data);
-            
-            // Fetch author info if we have a userId
-            if (data.userId) {
-               fetchAuthorName(data.userId);
-            }
-            
-            // Fetch category info
-            fetchCategory(data.id);
-         } catch (err) {
-            console.error("Error fetching story:", err);
-            setError("Failed to load the story. Please try again later.");
-         } finally {
-            setLoading(false);
-         }
-      };
+   // Fetch story data with React Query
+   const { data: story, isLoading: storyLoading, error: storyError } = useQuery({
+     queryKey: ['story', id],
+     queryFn: () => fetchStory(id),
+   });
 
-      fetchStory();
-   }, [id]);
-   
-   // Fetch author name from Clerk
-   const fetchAuthorName = async (userId: string) => {
-      try {
-         const response = await fetch(`/api/users/${userId}`);
-         if (response.ok) {
-            const data = await response.json();
-            setAuthorName(data.fullName || data.username || "Anonymous");
-         }
-      } catch (error) {
-         console.error("Error fetching author info:", error);
-         setAuthorName("Unknown Author");
-      }
-   };
-   
-   // Fetch category for the story
-   const fetchCategory = async (storyId: number) => {
-      try {
-         const response = await fetch(`/api/stories/${storyId}/category`);
-         if (response.ok) {
-            const data = await response.json();
-            if (data.categories && data.categories.length > 0) {
-               setCategory(data.categories[0].name);
-            }
-         }
-      } catch (error) {
-         console.error("Error fetching category:", error);
-      }
-   };
+   // Fetch author data with React Query (only if story has userId)
+   const { data: authorName = "Unknown Author" } = useQuery({
+     queryKey: ['author', story?.userId],
+     queryFn: () => fetchAuthorName(story?.userId as string),
+     enabled: !!story?.userId, // Only run query if userId exists
+   });
+
+   // Fetch category data with React Query
+   const { data: category = "" } = useQuery({
+     queryKey: ['category', story?.id],
+     queryFn: () => fetchCategory(story?.id as number),
+     enabled: !!story?.id, // Only run query if story id exists
+   });
 
    const toggleTranslation = (index: number) => {
       if (!story) return;
@@ -98,7 +85,7 @@ export default function StoryPage({
       );
    };
 
-   if (loading) {
+   if (storyLoading) {
       return (
          <main className="min-h-screen p-8 pb-16">
             <div className="max-w-3xl mx-auto text-center py-12">
@@ -108,7 +95,7 @@ export default function StoryPage({
       );
    }
 
-   if (error || !story) {
+   if (storyError || !story) {
       return (
          <main className="min-h-screen p-8 pb-16">
             <Link
@@ -118,11 +105,14 @@ export default function StoryPage({
                ← Back to Stories
             </Link>
             <div className="max-w-3xl mx-auto text-center py-12">
-               <p className="text-lg text-red-500">{error || "Story not found"}</p>
+               <p className="text-lg text-red-500">
+                 {storyError instanceof Error ? storyError.message : "Story not found"}
+               </p>
             </div>
          </main>
       );
    }
+   
    // Format the creation date
    const createdDate = story.createdAt 
       ? new Date(story.createdAt).toLocaleDateString('en-US', {
@@ -176,7 +166,7 @@ export default function StoryPage({
             </div>
 
             <div className="space-y-8">
-               {story.content.map((paragraph, index) => (
+               {story.content.map((paragraph: Paragraph, index: number) => (
                   <div key={index} className="bg-card-bg rounded-lg p-6">
                      <ClickableText
                         text={paragraph.german}
