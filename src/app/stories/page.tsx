@@ -31,7 +31,15 @@ export default function StoriesPage() {
       </Link>
       
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-semibold mb-8">German Stories</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-semibold">German Stories</h1>
+          <Link 
+            href="/community" 
+            className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors"
+          >
+            Community Stories
+          </Link>
+        </div>
         
         {isLoading ? (
           <div className="text-center py-12">
