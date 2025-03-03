@@ -16,6 +16,7 @@ export default function StoryPage({
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState<string | null>(null);
    const [authorName, setAuthorName] = useState<string>("");
+   const [category, setCategory] = useState<string>("");
    const [visibleTranslations, setVisibleTranslations] = useState<number[]>([]);
    const posthog = usePostHog();
 
@@ -34,6 +35,9 @@ export default function StoryPage({
             if (data.userId) {
                fetchAuthorName(data.userId);
             }
+            
+            // Fetch category info
+            fetchCategory(data.id);
          } catch (err) {
             console.error("Error fetching story:", err);
             setError("Failed to load the story. Please try again later.");
@@ -56,6 +60,21 @@ export default function StoryPage({
       } catch (error) {
          console.error("Error fetching author info:", error);
          setAuthorName("Unknown Author");
+      }
+   };
+   
+   // Fetch category for the story
+   const fetchCategory = async (storyId: number) => {
+      try {
+         const response = await fetch(`/api/stories/${storyId}/category`);
+         if (response.ok) {
+            const data = await response.json();
+            if (data.categories && data.categories.length > 0) {
+               setCategory(data.categories[0].name);
+            }
+         }
+      } catch (error) {
+         console.error("Error fetching category:", error);
       }
    };
 
@@ -143,6 +162,14 @@ export default function StoryPage({
                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         <span className="text-text-secondary">{authorName}</span>
+                     </div>
+                  )}
+                  {category && (
+                     <div className="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        <span className="text-text-secondary">{category}</span>
                      </div>
                   )}
                </div>
