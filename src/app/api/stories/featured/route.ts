@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAllStories } from "@/services/storyService";
+import { getStoriesByCommunityStatus } from "@/services/storyService";
 
 export async function GET() {
   try {
-    const allStories = await getAllStories();
+    const allStories = await getStoriesByCommunityStatus(false);
     const featuredStories = allStories.slice(0, 2); // Get first 2 stories
     
     return NextResponse.json(featuredStories);

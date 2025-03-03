@@ -60,3 +60,31 @@ export async function getStoryById(id: number): Promise<Story | null> {
     return null;
   }
 }
+
+// New function to get stories based on community status
+export async function getStoriesByCommunityStatus(includeCommunity: boolean): Promise<Story[]> {
+  try {
+    // Fetch stories with the specified community status
+    const filteredStories = await db.query.stories.findMany({
+      where: eq(stories.isCommunity, includeCommunity),
+      with: {
+        paragraphs: {
+          orderBy: (paragraphs, { asc }) => [asc(paragraphs.paragraphOrder)],
+        },
+      },
+      orderBy: (stories, { desc }) => [desc(stories.createdAt)],
+    });
+
+    // Format the response
+    const formattedStories = filteredStories.map(story => ({
+      ...story,
+      content: story.paragraphs,
+      paragraphs: undefined, // Remove the paragraphs property
+    }));
+
+    return formattedStories;
+  } catch (error) {
+    console.error(`Error fetching stories with community status ${includeCommunity}:`, error);
+    return [];
+  }
+}

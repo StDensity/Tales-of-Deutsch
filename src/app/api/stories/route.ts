@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAllStories } from "@/services/storyService";
+import {  getStoriesByCommunityStatus } from "@/services/storyService";
 
 export async function GET() {
   try {
-    const stories = await getAllStories();
+    const stories = await getStoriesByCommunityStatus(false);
     return NextResponse.json(stories);
   } catch (error) {
     console.error("Error fetching stories:", error);
