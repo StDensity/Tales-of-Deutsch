@@ -11,7 +11,7 @@ export default function DevelopmentDisclaimer() {
         </div>
         <div className="ml-3">
           <p className="text-sm text-primary">
-            <strong>Development Notice:</strong> This application is currently in development. All user data and contributions will be reset when development is complete.
+            <strong>Development Notice:</strong> This application is currently in development. User data and contributions may be reset or lost as we refine the platform.
           </p>
         </div>
       </div>
