@@ -1,4 +1,5 @@
 import { db } from "@/db";
+import { places } from "@/db/schema";
 import { Place, PlaceVocabulary } from "@/types/place";
 import { eq } from "drizzle-orm";
 
@@ -40,3 +41,18 @@ export async function getPlaceNameById(id: number): Promise<string> {
     return ""; 
   }
 }
+
+export async function getPlacesByCommunityStatus(includeCommunity: boolean): Promise<Place[]> {
+   try {
+     // Fetch places with the specified community status
+     const filteredPlaces = await db.query.places.findMany({
+       where: eq(places.isCommunity, includeCommunity),
+       orderBy: (places, { desc }) => [desc(places.createdAt)],
+     });
+ 
+     return filteredPlaces;
+   } catch (error) {
+     console.error(`Error fetching places with community status ${includeCommunity}:`, error);
+     return [];
+   }
+ }

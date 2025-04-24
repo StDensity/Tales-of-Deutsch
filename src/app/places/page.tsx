@@ -42,7 +42,15 @@ export default function PlacesPage() {
       </Link>
 
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-semibold mb-8">Explore Places</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-semibold">Explore Places</h1>
+          <Link 
+            href="/community/places" 
+            className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors"
+          >
+            Community Places
+          </Link>
+        </div>
 
         {loading && (
           <div className="flex justify-center items-center py-10">
@@ -84,6 +92,13 @@ export default function PlacesPage() {
             ))}
           </div>
         )}
+        
+        {/* AI-generated content notification */}
+        <div className="mt-12 mb-4 text-center">
+          <p className="text-xs text-text-secondary italic">
+            Words and translations are generated with LLM.
+          </p>
+        </div>
       </div>
     </main>
   );

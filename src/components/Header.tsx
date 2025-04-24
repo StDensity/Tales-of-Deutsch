@@ -64,6 +64,12 @@ export default function Header() {
             >
               All Stories
             </Link>
+            <Link 
+              href="/places" 
+              className={`transition-colors ${isActive('/places') ? 'text-accent font-medium' : 'text-text-primary hover:text-accent'}`}
+            >
+              All Places
+            </Link>
             
             {/* Admin link - only shown to admin users */}
             {isAdmin && (

@@ -5,16 +5,21 @@ import { places, placeVocabulary } from "@/db/schema";
 
 export async function POST(request: Request) {
    try {
+      // Get the current user
       const user = await currentUser();
-      const adminId = process.env.ADMIN_CLERK_USER_ID;
 
-      if (!user || user.id !== adminId) {
-         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      // Check if user is authenticated
+      if (!user) {
+         return NextResponse.json(
+            { error: "You must be signed in to contribute" },
+            { status: 401 }
+         );
       }
 
       const body = await request.json();
       const { placeName, vocabularyList } = body;
 
+      // Validate required fields
       if (
          !placeName ||
          !Array.isArray(vocabularyList) ||
@@ -42,13 +47,21 @@ export async function POST(request: Request) {
          );
       }
 
+      // Limit the number of vocabulary items to prevent abuse
+      if (vocabularyList.length > 50) {
+         return NextResponse.json(
+            { error: "Maximum of 50 vocabulary items allowed per place" },
+            { status: 400 }
+         );
+      }
+
       // Insert the new place into the database
       const [newPlace] = await db
          .insert(places)
          .values({
             name: placeName,
             userId: user.id,
-            isCommunity: false, // Admin-created places are community by default
+            isCommunity: true,
          })
          .returning();
 
@@ -65,7 +78,8 @@ export async function POST(request: Request) {
          english: vocab.english.trim(),
          placeId: newPlace.id,
          userId: user.id,
-         isCommunity: true, // Admin-created vocabulary is community by default
+         isCommunity: true,
+         isApproved: false, // Community vocabulary needs approval
       }));
 
       await db.insert(placeVocabulary).values(vocabularyItems);
@@ -73,6 +87,8 @@ export async function POST(request: Request) {
       // Return success response with the created place
       return NextResponse.json({
          success: true,
+         message:
+            "Place submitted successfully! It will be reviewed before publishing.",
          place: {
             id: newPlace.id,
             name: newPlace.name,
@@ -80,9 +96,9 @@ export async function POST(request: Request) {
          },
       });
    } catch (error) {
-      console.error("Error creating place:", error);
+      console.error("Error creating community place:", error);
       return NextResponse.json(
-         { error: "Failed to create place" },
+         { error: "Failed to submit place" },
          { status: 500 }
       );
    }

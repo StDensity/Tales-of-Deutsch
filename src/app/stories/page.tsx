@@ -36,7 +36,7 @@ export default function StoriesPage() {
           {/* German Stories */}
           </h1>
           <Link 
-            href="/community" 
+            href="/community/stories" 
             className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors"
           >
             Community Stories

@@ -55,7 +55,7 @@ export default function CommunityStoriesPage() {
                      AI <Sparkles className="size-3.5 animate-pulse" />
                   </span>
                   <p className="flex items-center text-xs md:text-base text-nowrap">
-                     Contribute a Story
+                     Contribute
                   </p>
                </Link>
             </div>
