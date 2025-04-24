@@ -68,7 +68,7 @@ export default function Header() {
             {/* Admin link - only shown to admin users */}
             {isAdmin && (
               <Link 
-                href="/admin/stories" 
+                href="/admin" 
                 className={`transition-colors ${isActive('/admin/stories') ? 'text-accent font-medium' : 'text-text-primary hover:text-accent'}`}
               >
                 Admin
