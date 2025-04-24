@@ -30,17 +30,21 @@ export async function getPlaceVocabulary(
 }
 
 
-export async function getPlaceNameById(id: number): Promise<string> {
+export async function getPlaceDetailsById(id: number): Promise<Place|undefined> {
   try {
     const place = await db.query.places.findFirst({
       where: (places) => eq(places.id, id),
     });
-    return place?.name || ""
+    return place 
   } catch (error) {
     console.error(`Error fetching place name for id ${id}:`, error);
-    return ""; 
   }
 }
+
+
+
+
+
 
 export async function getPlacesByCommunityStatus(includeCommunity: boolean): Promise<Place[]> {
    try {

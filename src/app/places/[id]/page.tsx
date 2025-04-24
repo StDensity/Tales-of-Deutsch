@@ -3,15 +3,16 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { PlaceVocabulary } from "@/types/place";
-import { Loader2, AlertCircle, MapPin } from "lucide-react";
+import { Place, PlaceVocabulary } from "@/types/place";
+import { Loader2, AlertCircle, MapPin, ChartNoAxesGantt } from "lucide-react";
 import { useState } from "react";
 import ClickableText from "@/components/ClickableText"; // Import ClickableText component
 
 // Define the expected shape of the API response
 interface PlaceData {
-   placeName: string | null;
+   placeDetails: Place;
    vocabularies: PlaceVocabulary[];
+
 }
 
 // Function to fetch place data (name and vocabulary)
@@ -24,6 +25,16 @@ const fetchPlaceData = async (placeId: number): Promise<PlaceData> => {
       );
    }
    return response.json();
+};
+
+// Add function to fetch author name
+const fetchAuthorName = async (userId: string) => {
+  const response = await fetch(`/api/users/${userId}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch author");
+  }
+  const data = await response.json();
+  return data.fullName || data.username || "Anonymous";
 };
 
 
@@ -48,6 +59,13 @@ export default function PlaceDetailPage() {
       enabled: !isNaN(placeId),
       staleTime: 5 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
+   });
+
+   // Add query to fetch author name
+   const { data: authorName = "Unknown Author" } = useQuery({
+     queryKey: ['author', data?.placeDetails?.userId],
+     queryFn: () => fetchAuthorName(data?.placeDetails?.userId as string),
+     enabled: !!data?.placeDetails?.userId, // Only run query if userId exists
    });
 
    // Function to toggle individual secondary translation visibility
@@ -94,16 +112,55 @@ export default function PlaceDetailPage() {
          </Link>
 
          <article className="max-w-3xl mx-auto">
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-start mb-4">
                <h1 className="text-4xl font-semibold flex items-center">
                   <MapPin className="mr-3 h-7 w-7 text-primary shrink-0" />
                   <span className="truncate">
                      {isLoading
                         ? "Loading Place..."
-                        : data?.placeName || `Place #${placeId}`}
+                        : data?.placeDetails.name || `Place #${placeId}`}
                   </span>
                </h1>
             </div>
+            
+            {/* Add metadata section with author and date */}
+            {!isLoading && !isError && data && (
+               <div className="flex flex-wrap items-center gap-4 mb-8 text-sm">
+                  {data.placeDetails.isCommunity && (
+                     <div className="bg-accent/20 text-accent px-4 py-2 rounded-md font-medium">
+                        Community
+                     </div>
+                  )}
+                  <div className="flex items-center gap-4">
+                     {data.placeDetails.createdAt && (
+                        <div className="flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                           </svg>
+                           <span className="text-text-secondary">
+                              {new Date(data.placeDetails.createdAt).toLocaleDateString('en-US', {
+                                 year: 'numeric',
+                                 month: 'long',
+                                 day: 'numeric'
+                              })}
+                           </span>
+                        </div>
+                     )}
+                     {authorName && (
+                        <div className="flex items-center">
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                           </svg>
+                           <span className="text-text-secondary">{authorName}</span>
+                        </div>
+                     )}
+                     <div className="flex items-center">
+                        <ChartNoAxesGantt className="text-text-secondary"/>
+                        <span className="text-text-secondary">{data.vocabularies.length} words</span>
+                     </div>
+                  </div>
+               </div>
+            )}
 
             <div className="flex items-center justify-end space-x-2 mb-8">
                <button

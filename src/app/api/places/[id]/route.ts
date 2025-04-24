@@ -1,4 +1,4 @@
-import { getPlaceNameById, getPlaceVocabulary } from "@/services/placeService";
+import { getPlaceDetailsById, getPlaceVocabulary } from "@/services/placeService";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -8,10 +8,9 @@ export async function GET(
    try {
       const { id } = await params;
       const placeVocabularies = await getPlaceVocabulary(id);
-      const placeName = await getPlaceNameById(id);
-
+      const placeDetails = await getPlaceDetailsById(id);
       return NextResponse.json({
-        placeName: placeName,
+      placeDetails, // Assuming you want the first vocabulary entry for the place
         vocabularies: placeVocabularies,
       });
    } catch (error) {
