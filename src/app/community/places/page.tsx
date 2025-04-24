@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Place } from "@/types/place";
-import { Loader2, AlertCircle, MapPin, Plus } from "lucide-react";
+import { Loader2, AlertCircle, MapPin, Plus, Sparkles } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 // Function to fetch community places
@@ -45,12 +45,16 @@ export default function CommunityPlacesPage() {
             Community Places
           </h1>
           <Link
-            href="/community/contribute/place"
-            className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors flex items-center"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Contribute Place
-          </Link>
+                  href="/community/contribute"
+                  className="px-5 py-2.5 relative text-sm sm:text-base bg-accent text-white rounded-md hover:bg-accent/90 transition-colors shadow-sm group"
+               >
+                  <span className="absolute -top-2 -right-2 flex items-center gap-1 bg-highlight px-2 py-0.5 rounded-full text-white font-medium shadow-md border border-white/20 text-xs">
+                     AI <Sparkles className="size-3.5 animate-pulse" />
+                  </span>
+                  <p className="flex items-center text-xs md:text-base text-nowrap">
+                     Contribute
+                  </p>
+               </Link>
         </div>
 
         <div className="bg-card-bg border-2 border-accent/20 p-6 rounded-lg mb-8">
@@ -90,11 +94,11 @@ export default function CommunityPlacesPage() {
               Be the first to contribute a place with vocabulary!
             </p>
             <Link
-              href="/community/contribute/place"
+              href="/community/contribute"
               className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent/80 transition-colors inline-flex items-center"
             >
               <Plus className="h-4 w-4 mr-1" />
-              Contribute Place
+              Contribute
             </Link>
           </div>
         )}
